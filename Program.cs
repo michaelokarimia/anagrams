@@ -10,7 +10,7 @@ namespace hackerRank
     {
         static void Main(string[] args)
         {
-            var input = "ABCDEF";
+            var input = "BBDCEF";
             var searchString = "BBCDEF";
 
             int SCORE = 100;
@@ -19,14 +19,32 @@ namespace hackerRank
 
             var sortedSearchString = getSortedString(searchString);
 
-            SCORE = GetScore(input, searchString);
+            SCORE = GetScore(sortedInput, sortedSearchString, SCORE);
 
-
+            if (input != searchString)
+            {
+                var swappingPenalty = calculateSwappingPenalty(input, searchString);
+                SCORE-=swappingPenalty;
+            }
 
             Console.WriteLine("Score is: {0}",SCORE);
 
             Console.ReadKey();
 
+        }
+
+        private static int calculateSwappingPenalty(string input, string searchString)
+        {
+            int requiredSwaps =0;
+            //we know the two strings are anagrams of each length, iterate through through each and calculate penalty 
+            for (int i = 0; i < input.Length; i++)
+            {
+                if (input[i] != searchString[i])
+                {
+                    requiredSwaps++;
+                }
+            }
+            return (requiredSwaps/2)*5;
         }
 
         private static string getSortedString(string input)
@@ -43,9 +61,9 @@ namespace hackerRank
             return sorted;
         }
 
-        private static int GetScore(string input, string searchString)
+        private static int GetScore(string input, string searchString, int currentScore)
         {
-            int SCORE = 0;
+            int SCORE = currentScore;
             Trie mytrie = new Trie();
 
             mytrie.InsertRange(new List<string> {input});
@@ -53,7 +71,7 @@ namespace hackerRank
 
             if (ContainsString(input,searchString))
             {
-                return 100;
+                return SCORE;
             }
 
             SCORE -= 5;
@@ -62,7 +80,7 @@ namespace hackerRank
             {
                 var chopTrailingCharOff = searchString.Substring(0, searchString.Length-1);
                 
-                return GetScore(input, chopTrailingCharOff);
+                return GetScore(input, chopTrailingCharOff, SCORE);
             }
             
 
