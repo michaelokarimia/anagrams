@@ -10,22 +10,42 @@ namespace hackerRank
     {
         static void Main(string[] args)
         {
-            var input = "ABCEDEF";
+            var input = "ABCDEF";
             var searchString = "BBCDEF";
 
             int SCORE = 100;
 
+            var sortedInput = getSortedString(input);
+
+            var sortedSearchString = getSortedString(searchString);
+
             SCORE = GetScore(input, searchString);
 
 
+
             Console.WriteLine("Score is: {0}",SCORE);
+
             Console.ReadKey();
 
         }
 
+        private static string getSortedString(string input)
+        {
+            var charArray = input.ToCharArray();
+            Array.Sort(charArray);
+            var sorted = "";
+
+            foreach (char c in charArray)
+            {
+                sorted += c;
+            }
+
+            return sorted;
+        }
+
         private static int GetScore(string input, string searchString)
         {
-            int SCORE = 100;
+            int SCORE = 0;
             Trie mytrie = new Trie();
 
             mytrie.InsertRange(new List<string> {input});
@@ -36,11 +56,13 @@ namespace hackerRank
                 return 100;
             }
 
+            SCORE -= 5;
             //try next char
             if (searchString.Length > 0)
             {
                 var chopTrailingCharOff = searchString.Substring(0, searchString.Length-1);
-                return SCORE - GetScore(input, chopTrailingCharOff);
+                
+                return GetScore(input, chopTrailingCharOff);
             }
             
 
