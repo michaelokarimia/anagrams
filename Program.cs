@@ -10,22 +10,73 @@ namespace hackerRank
     {
         static void Main(string[] args)
         {
-            var input = "BBDCEF";
-            var searchString = "BBCDEF";
+            //case one
+            //var input = "BBDCEF";
+            //var searchString = "BBCDEF";
 
+            //case two
+            //var input = "BACDFE";
+            //var searchString = "ABCDEF";
+
+            //var input = "HARRIS";
+            //var searchString = "HARIRS";
+
+            //var input = "HARRIS";
+            //var searchString = "HRAIRS";
+
+            //var input = "BACDFE";
+            //var searchString = "ABCDEF";
+
+            Console.WriteLine("Enter two space delimited string to compare with each other");
+
+            var joinedStrings = Console.ReadLine();
+
+            //var input = "ABCFDE";
+            //var searchString = "ABCDEF";
+
+            var arrJoinedStrings = joinedStrings.Split(' ');
+
+            var input = arrJoinedStrings[0];
+
+            var searchString = arrJoinedStrings[1];
+            
             int SCORE = 100;
 
-            var sortedInput = getSortedString(input);
-
-            var sortedSearchString = getSortedString(searchString);
-
-            SCORE = GetScore(sortedInput, sortedSearchString, SCORE);
-
-            if (input != searchString)
+            if (input == searchString)
             {
-                var swappingPenalty = calculateSwappingPenalty(input, searchString);
-                SCORE-=swappingPenalty;
+                // Perfect match no action needed
             }
+            else if (input.Length != searchString.Length)
+            {
+                //different lengths, score zero
+                SCORE = 0;
+            }
+            else
+            {
+                //same length, check if anagrams
+
+                var sortedInput = getSortedString(input);
+
+                var sortedSearchString = getSortedString(searchString);
+
+                if (sortedInput != sortedSearchString)
+                {
+                    SCORE = 0;
+                }
+                else
+                {
+                    //They are anagrams, calculate swapping score
+
+                    SCORE = GetScore(input, searchString, SCORE);
+
+                    //is the swapping penalty the diff in depths of the Trie between two anagrams?
+
+                    var swappingPenalty = calculateSwappingPenalty(input, searchString);
+                    SCORE -= swappingPenalty;
+                    
+                }
+            }
+
 
             Console.WriteLine("Score is: {0}",SCORE);
 
@@ -33,18 +84,36 @@ namespace hackerRank
 
         }
 
-        private static int calculateSwappingPenalty(string input, string searchString)
+        private static int calculateSwappingPenalty(string originalString, string searchString)
         {
+            
+            var inputTrie = new Trie();
+            inputTrie.Insert(originalString);
+
+            var searchTrie = new Trie();
+            searchTrie.Insert(searchString);
+
+            
+
             int requiredSwaps =0;
+
+            var currentInputNode = inputTrie.Prefix(originalString);
+            var currentSearchNode = searchTrie.Prefix(searchString);
+
             //we know the two strings are anagrams of each length, iterate through through each and calculate penalty 
-            for (int i = 0; i < input.Length; i++)
+            for (int i = 0; i < currentInputNode.Depth; i++)
             {
-                if (input[i] != searchString[i])
+                if (currentInputNode.Value != currentSearchNode.Value)
                 {
                     requiredSwaps++;
                 }
+
+                if(currentInputNode.Parent != null)
+                    { currentInputNode = currentInputNode.Parent;}
+                if(currentInputNode.Parent != null)
+                { currentSearchNode = currentSearchNode.Parent;}
             }
-            return (requiredSwaps/2)*5;
+            return requiredSwaps*5;
         }
 
         private static string getSortedString(string input)
